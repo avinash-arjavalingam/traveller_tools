@@ -1,5 +1,6 @@
 import random
 
+
 class StarSystem:
 
     base_map = {'N': "Naval Base", 'S': "Scout Base", 'R': "Research Base", 'T': "TAS Hostel",
@@ -339,6 +340,38 @@ class StarSystem:
             cargo_list.append(str(cargoes[cargo_weight]) + " lots of " + str(cargo_weight) + " tons")
 
         return cargo_list
+
+    def get_mail_dm(self, other_planet, armed, navy_scout_rank, soc_stand_dm):
+        mail_dm = 0
+        freight_dm = self.get_freight_base_dm(other_planet)
+        if freight_dm <= -10:
+            mail_dm = -2
+        elif (freight_dm <= -5) and (freight_dm >= -9):
+            mail_dm = -1
+        elif (freight_dm <= 4) and (freight_dm >= -4):
+            mail_dm = 0
+        elif (freight_dm <= 9) and (freight_dm >= 5):
+            mail_dm = 1
+        elif freight_dm >= 10:
+            mail_dm = 2
+
+        if armed:
+            mail_dm += 2
+
+        mail_dm = mail_dm + navy_scout_rank + soc_stand_dm
+
+        if self.tech_level <= 5:
+            mail_dm -= 4
+
+        return mail_dm
+
+    def has_mail(self, other_planet, armed, navy_scout_rank, soc_stand_dm, mail_roll):
+        mail_dm = self.get_mail_dm(other_planet, armed, navy_scout_rank, soc_stand_dm)
+
+        if mail_roll + mail_dm >= 12:
+            return True
+        else:
+            return False
 
     @staticmethod
     def set_to_rep(char_set):
