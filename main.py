@@ -1,7 +1,7 @@
 from starsystem import StarSystem
 
 def functional():
-    test_planet = StarSystem("Qewra", "0105", "D46668A-3", "SG", "Ag Lt Ni Ri A")
+    test_planet = StarSystem("Zudqe", "0408", "A200657-14", "NTC", "Ht Na Ni Va")
     print(test_planet)
 
 

@@ -209,8 +209,7 @@ class StarSystem:
     starport_quality_map = {'A': "Excellent", 'B': "Good", 'C': "Routine", 'D': "Poor", 'E': "Frontier",
                             'X': "No Starport"}
 
-    size_table = ["800 km", "1,600 km", "3,200 km", "4,800 km", "6,400 km", "8,000 km", "9,600 km", "11,200 km",
-                  "12,800 km", "14,400 km", "16,000 km"]
+    size_table = [800, 1600, 3200, 4800, 6400, 8000, 9600, 11200, 12800, 14400, 16000]
 
     atmosphere_table = ["None", "Trace", "Very Thin, Tainted", "Very Thin", "Thin, Tainted", "Thin", "Standard",
                         "Standard, Tainted", "Dense", "Dense, Tainted", "Exotic", "Corrosive", "Insidious",
@@ -240,7 +239,7 @@ class StarSystem:
         self.population = (self.hex_char_to_int(4), self.hex_char_to_istic(4, self.population_table))
         self.government_type = (self.hex_char_to_int(5), self.hex_char_to_istic(5, self.government_table))
         self.law_level = self.hex_char_to_int(6)
-        self.tech_level = self.hex_char_to_int(8)
+        self.tech_level = int(self.characteristics[8:])
 
         self.bases = []
         if bases is not None:
@@ -282,7 +281,7 @@ class StarSystem:
         total_str += "NAME: " + self.name + "\n"
         total_str += "LOCATION: " + self.location + "\n"
         total_str += "STARPORT QUALITY: " + self.set_to_rep(self.starport_quality) + "\n"
-        total_str += "SIZE (DIAMETER): " + self.set_to_rep(self.size) + "\n"
+        total_str += "SIZE (DIAMETER): " + self.set_to_rep(self.size) + " km \n"
         total_str += "ATMOSPHERE TYPE: " + self.set_to_rep(self.atmosphere_type) + "\n"
         total_str += "HYDROGRAPHIC PERCENTAGE: " + self.set_to_rep(self.hydrographic_percentage) + "\n"
         total_str += "POPULATION: " + self.set_to_rep(self.population) + "\n"
