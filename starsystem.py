@@ -336,7 +336,7 @@ class StarSystem:
         self.lot_to_cargo(maj_lots, 10, cargoes)
 
         cargo_list = []
-        for cargo_weight in cargoes.keys():
+        for cargo_weight in sorted(cargoes.keys()):
             cargo_list.append(str(cargoes[cargo_weight]) + " lots of " + str(cargo_weight) + " tons")
 
         return cargo_list
