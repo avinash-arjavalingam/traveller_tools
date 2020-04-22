@@ -16,5 +16,8 @@ def functional():
     print(test_planet.get_mail_dm(test_planet_two, True, 3, 2))
     print(test_planet.has_mail(test_planet_two, True, 3, 2, 8))
 
+    print(test_planet.get_session_purchase_goods())
+    print(test_planet.buy_goods("Basic Ore", 15))
+
 functional()
 

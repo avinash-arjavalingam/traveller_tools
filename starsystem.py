@@ -280,6 +280,8 @@ class StarSystem:
             self.sell_goods_dm[good] = self.good_trade_dm(good, self.trade_goods_sal) \
                                        - self.good_trade_dm(good, self.trade_goods_pur)
 
+        self.session_purchase_goods = {}
+
     def hex_char_to_int(self, index):
         return int((self.characteristics[index]), 16)
 
@@ -402,6 +404,54 @@ class StarSystem:
         if not changed:
             max_pur_dm = 0
         return max_pur_dm
+
+    def get_session_purchase_goods(self):
+        if self.session_purchase_goods != {}:
+            return self.session_purchase_goods
+        else:
+            temp_session_goods = {}
+            session_goods = {}
+            for good, dm in self.default_trade_goods_dm_map.items():
+                weight = random.randint(1, 6) * self.trade_goods_mod[good]
+                temp_session_goods[good] = [weight, self.trade_goods_pri[good], dm]
+            num_extra = random.randint(1, 6)
+            for i in range(num_extra):
+                sixty_six_roll = (random.randint(1, 6) * 10) + random.randint(1, 6)
+                added_good = self.trade_goods_map[sixty_six_roll]
+                added_weight = random.randint(1, 6) * self.trade_goods_mod[added_good]
+                if added_good in temp_session_goods.keys():
+                    temp_session_goods[added_good][0] = temp_session_goods[added_good][0] + added_weight
+                else:
+                    temp_session_goods[added_good] = [added_weight, self.trade_goods_pri[added_good],
+                                                      self.good_trade_dm(added_good, self.trade_goods_pur)
+                                                      - self.good_trade_dm(added_good, self.trade_goods_sal)]
+
+            for final_good, vals in temp_session_goods.items():
+                session_goods[final_good] = str(vals[0]) + " tons at " + str(vals[1]) \
+                                            + " per ton at a purchase DM of " + str(vals[2])
+
+            self.session_purchase_goods = temp_session_goods
+
+            return session_goods
+
+    def buy_goods(self, good, broker_roll):
+        if good not in self.session_purchase_goods.keys():
+            return "Not available! Idiot"
+        good_value = self.session_purchase_goods[good]
+        true_roll = broker_roll + good_value[2]
+        true_roll = max(true_roll, -1)
+        true_roll = min(true_roll, 21)
+        true_roll += 1
+        price_change = self.modified_price_table_plus_one[true_roll][0]
+
+        new_price = price_change * good_value[1]
+
+        ret_str = "At a " + str(int(price_change * 100)) + "% price change, there are " + str(good_value[0]) + \
+                  " tons of " + good + " at " + str(int(new_price)) + " per ton"
+        return ret_str
+
+    def clear_session(self):
+        self.session_purchase_goods = {}
 
     @staticmethod
     def set_to_rep(char_set):
