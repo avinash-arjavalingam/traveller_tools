@@ -269,6 +269,17 @@ class StarSystem:
                 if code in self.trade_goods_default_available.keys():
                     self.default_trade_goods = self.default_trade_goods.union(self.trade_goods_default_available[code])
 
+        self.default_trade_goods_dm_map = {}
+
+        for good in self.default_trade_goods:
+            self.default_trade_goods_dm_map[good] = self.good_trade_dm(good, self.trade_goods_pur) \
+                                                    - self.good_trade_dm(good, self.trade_goods_sal)
+
+        self.sell_goods_dm = {}
+        for good in self.trade_goods_mod.keys():
+            self.sell_goods_dm[good] = self.good_trade_dm(good, self.trade_goods_sal) \
+                                       - self.good_trade_dm(good, self.trade_goods_pur)
+
     def hex_char_to_int(self, index):
         return int((self.characteristics[index]), 16)
 
@@ -328,8 +339,11 @@ class StarSystem:
 
         freight_pos = self.freight_roll_table[dm]
         inc_lots = self.freight_rolling(freight_pos[0])
+        # print("Incidental Lots: " + str(inc_lots))
         min_lots = self.freight_rolling(freight_pos[1])
+        # print("Minor Lots: " + str(min_lots))
         maj_lots = self.freight_rolling(freight_pos[2])
+        # print("Major Lots: " + str(maj_lots))
         cargoes = {}
         self.lot_to_cargo(inc_lots, 1, cargoes)
         self.lot_to_cargo(min_lots, 5, cargoes)
@@ -372,6 +386,22 @@ class StarSystem:
             return True
         else:
             return False
+
+    def good_trade_dm(self, good, trade_map):
+        good_pur_dm = trade_map[good]
+        changed = False
+        max_pur_dm = float('-inf')
+        if self.trade_codes is not None:
+            for code in self.trade_codes:
+                if code in good_pur_dm.keys():
+                    code_pur_mod = good_pur_dm[code]
+                    if code_pur_mod > max_pur_dm:
+                        changed = True
+                        max_pur_dm = code_pur_mod
+
+        if not changed:
+            max_pur_dm = 0
+        return max_pur_dm
 
     @staticmethod
     def set_to_rep(char_set):
@@ -427,6 +457,7 @@ class StarSystem:
         total_str += "BASES: " + str(self.bases) + "\n"
         total_str += "TRADE CODES: " + str(self.trade_codes) + "\n"
         total_str += "FACTION: " + str(self.faction) + "\n"
-        total_str += "DEFAULT TRADE GOODS: " + str(self.default_trade_goods) + "\n"
+        total_str += "DEFAULT TRADE GOODS: " + str(self.default_trade_goods_dm_map) + "\n"
+        total_str += "SELL GOODS DM: " + str(self.sell_goods_dm) + "\n"
 
         return total_str
