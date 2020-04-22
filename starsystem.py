@@ -261,9 +261,10 @@ class StarSystem:
 
         self.default_trade_goods = {"Basic Electronics", "Basic Machine Parts", "Basic Manufactured Goods",
                                     "Basic Raw Materials", "Basic Consumables", "Basic Ore"}
-        for code in self.trade_codes:
-            if code in self.trade_goods_default_available.keys():
-                self.default_trade_goods = self.default_trade_goods.union(self.trade_goods_default_available[code])
+        if self.trade_codes is not None:
+            for code in self.trade_codes:
+                if code in self.trade_goods_default_available.keys():
+                    self.default_trade_goods = self.default_trade_goods.union(self.trade_goods_default_available[code])
 
     def hex_char_to_int(self, index):
         return int((self.characteristics[index]), 16)
