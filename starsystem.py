@@ -1,3 +1,5 @@
+import random
+
 class StarSystem:
 
     base_map = {'N': "Naval Base", 'S': "Scout Base", 'R': "Research Base", 'T': "TAS Hostel",
@@ -13,12 +15,12 @@ class StarSystem:
                                     "Current freight traffic", "Destination freight traffic"]
 
     trade_codes_mod_table = {"Agricultural": [0, 0, 2, 1], "Asteroid": [1, -1, -3, 1],
-                             "Barren": [-5, -5, float('-inf'), -5], "Desert": [-1, -1, -3, 0],
+                             "Barren": [-5, -5, -1000, -5], "Desert": [-1, -1, -3, 0],
                              "Fluid Oceans": [0, 0, -3, 0], "Garden": [2, 2, 2, 1], "High Population": [0, 4, 2, -1],
                              "Ice-Capped": [1, -1, -3, 0], "Industrial": [2, 1, 3, 2], "Low Population": [0, -4, -5, 0],
                              "Non-Agricultural": [0, 0, -3, 1], "Non-Industrial": [0, -1, -3, 1],
                              "Poor": [-2, -1, -3, -3], "Rich": [-1, 2, 2, 2], "Water World": [0, 0, -3, 0],
-                             "Amber Zone": [2, -2, 5, -5], "Red Zone": [4, -4, -5, float('-inf')]}
+                             "Amber Zone": [2, -2, 5, -5], "Red Zone": [4, -4, -5, -1000]}
 
     trade_goods_default_available = {"Agricultural": {"Biochemicals", "Live Animals", "Luxury Consumables", "Textiles",
                                                       "Uncommon Raw Materials", "Wood", "Illegal Biochemicals",
@@ -272,9 +274,48 @@ class StarSystem:
     def hex_char_to_istic(self, index, istic_list):
         return istic_list[self.hex_char_to_int(index)]
 
+    def get_passengers_base_dm(self, other_planet):
+        dm = self.population[0]
+
+        if self.trade_codes is not None:
+            for code in self.trade_codes:
+                if code in self.trade_codes_mod_table.keys():
+                    dm += self.trade_codes_mod_table[code][0]
+
+        if other_planet.trade_codes is not None:
+            for code in other_planet.trade_codes:
+                if code in other_planet.trade_codes_mod_table.keys():
+                    dm += other_planet.trade_codes_mod_table[code][1]
+
+        return dm
+
+    def get_passengers(self, other_planet, carouse_check=8):
+        dm = self.get_passengers_base_dm(other_planet)
+        effect = int((carouse_check - 8) / 2)
+        dm += effect
+        dm = min(dm, 16)
+
+        pass_pos = self.passenger_roll_table[dm]
+        return {"Low Passages": self.pass_rolling(pass_pos[0]), "Middle Passages": self.pass_rolling(pass_pos[1]),
+                "High Passages": self.pass_rolling(pass_pos[2])}
+
     @staticmethod
     def set_to_rep(char_set):
         return str(char_set[0]) + " -> " + str(char_set[1])
+
+    @staticmethod
+    def pass_rolling(pass_pos_list):
+        total = 0
+        for i in range(pass_pos_list[0]):
+            total += random.randint(1, 6)
+
+        for i in range(pass_pos_list[1]):
+            total -= random.randint(1, 6)
+
+        total -= pass_pos_list[2]
+
+        ret = max(total, 0)
+        return ret
 
     def __str__(self):
         total_str = ""
