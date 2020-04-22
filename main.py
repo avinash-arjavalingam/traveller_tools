@@ -9,5 +9,8 @@ def functional():
     print(test_planet.get_passengers_base_dm(test_planet_two))
     print(test_planet.get_passengers(test_planet_two, 12))
 
+    print(test_planet.get_freight_base_dm(test_planet_two))
+    print(test_planet.get_freight(test_planet_two))
+
 functional()
 

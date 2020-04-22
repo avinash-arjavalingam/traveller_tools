@@ -287,6 +287,8 @@ class StarSystem:
                 if code in other_planet.trade_codes_mod_table.keys():
                     dm += other_planet.trade_codes_mod_table[code][1]
 
+        dm = max(0, dm)
+
         return dm
 
     def get_passengers(self, other_planet, carouse_check=8):
@@ -298,6 +300,45 @@ class StarSystem:
         pass_pos = self.passenger_roll_table[dm]
         return {"Low Passages": self.pass_rolling(pass_pos[0]), "Middle Passages": self.pass_rolling(pass_pos[1]),
                 "High Passages": self.pass_rolling(pass_pos[2])}
+
+    def get_freight_base_dm(self, other_planet):
+        dm = other_planet.population[0]
+
+        if self.trade_codes is not None:
+            for code in self.trade_codes:
+                if code in self.trade_codes_mod_table.keys():
+                    dm += self.trade_codes_mod_table[code][2]
+
+        if other_planet.trade_codes is not None:
+            for code in other_planet.trade_codes:
+                if code in other_planet.trade_codes_mod_table.keys():
+                    dm += other_planet.trade_codes_mod_table[code][3]
+
+        tech_mod = min(abs(self.tech_level - other_planet.tech_level), 5)
+        dm -= tech_mod
+
+        dm = max(0, dm)
+
+        return dm
+
+    def get_freight(self, other_planet):
+        dm = self.get_freight_base_dm(other_planet)
+        dm = min(dm, 16)
+
+        freight_pos = self.freight_roll_table[dm]
+        inc_lots = self.freight_rolling(freight_pos[0])
+        min_lots = self.freight_rolling(freight_pos[1])
+        maj_lots = self.freight_rolling(freight_pos[2])
+        cargoes = {}
+        self.lot_to_cargo(inc_lots, 1, cargoes)
+        self.lot_to_cargo(min_lots, 5, cargoes)
+        self.lot_to_cargo(maj_lots, 10, cargoes)
+
+        cargo_list = []
+        for cargo_weight in cargoes.keys():
+            cargo_list.append(str(cargoes[cargo_weight]) + " lots of " + str(cargo_weight) + " tons")
+
+        return cargo_list
 
     @staticmethod
     def set_to_rep(char_set):
@@ -316,6 +357,26 @@ class StarSystem:
 
         ret = max(total, 0)
         return ret
+
+    @staticmethod
+    def freight_rolling(freight_pos_list):
+        total = 0
+        for i in range(freight_pos_list[0]):
+            total += random.randint(1, 6)
+
+        total += freight_pos_list[1]
+
+        ret = max(total, 0)
+        return ret
+
+    @staticmethod
+    def lot_to_cargo(amount, mod, cargo_map):
+        for i in range(amount):
+            single_cargo = random.randint(1, 6) * mod
+            if single_cargo in cargo_map.keys():
+                cargo_map[single_cargo] += 1
+            else:
+                cargo_map[single_cargo] = 1
 
     def __str__(self):
         total_str = ""
