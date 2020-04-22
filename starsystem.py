@@ -450,6 +450,21 @@ class StarSystem:
                   " tons of " + good + " at " + str(int(new_price)) + " per ton"
         return ret_str
 
+    def sell_goods(self, good, broker_roll):
+        good_sell_dm = self.sell_goods_dm[good]
+        true_roll = broker_roll + good_sell_dm
+        true_roll = max(true_roll, -1)
+        true_roll = min(true_roll, 21)
+        true_roll += 1
+        price_change = self.modified_price_table_plus_one[true_roll][1]
+
+        new_price = price_change * self.trade_goods_pri[good]
+
+        ret_str = "At a " + str(int(price_change * 100)) + "% you can sell " + \
+                  good + " at " + str(int(new_price)) + " per ton"
+
+        return ret_str
+
     def clear_session(self):
         self.session_purchase_goods = {}
 
