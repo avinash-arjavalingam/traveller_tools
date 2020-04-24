@@ -214,9 +214,71 @@ class StarSystem:
 
     size_table = [800, 1600, 3200, 4800, 6400, 8000, 9600, 11200, 12800, 14400, 16000]
 
-    atmosphere_table = ["None", "Trace", "Very Thin, Tainted", "Very Thin", "Thin, Tainted", "Thin", "Standard",
-                        "Standard, Tainted", "Dense", "Dense, Tainted", "Exotic", "Corrosive", "Insidious",
-                        "Dense, High", "Thin, Low", "Unusual"]
+    distance_to_time_map = [[1000, 633], [10000, 2000], [100000, 6300], [300000, 10980], [400000, 12660],
+                              [1000000, 19980], [10000000, 63360], [30000000, 109512], [4500000, 134280],
+                              [100000000, 200160], [150000000, 244800], [255000000, 319320], [600000000, 489960],
+                              [900000000, 600120], [1000000000, 630720]]
+
+    starport_info_columns = ["Berthing Cost 1d6 Multiplier", "Fuel Available", "Facilities"]
+
+    starport_info_map = {'A': [1000, "Refined", ["Shipyard (all)", "Repair"]],
+                         'B': [500, "Refined", ["Shiyard (spacecraft)", "Repair"]],
+                         'C': [100, "Unrefined", ["Shiyard (small craft)", "Repair"]],
+                         'D': [10, "Unrefined", ["Limited Repair"]],
+                         'E': [0, "None", ["None"]],
+                         'X': [0, "None", ["None"]]}
+
+    atmosphere_table = [["None"], ["Trace"], ["Very Thin", "Tainted"], ["Very Thin"], ["Thin", "Tainted"], ["Thin"],
+                        ["Standard"], ["Standard", "Tainted"], ["Dense"], ["Dense", "Tainted"], ["Exotic"],
+                        ["Corrosive"], ["Insidious"], ["Dense", "High"], ["Thin", "Low"], ["Unusual"]]
+
+    atmosphere_columns = ["Examples", "Pressure", "Survival Gear Required"]
+
+    atmosphere_map = [["Moon", "0.00", "Vacc Suit"], ["Mars", "0.001 to 0.09", "Vacc Suit"],
+                      ["None", "0.1 to 0.42", "Respirator, Filter"], ["None", "0.1 to 0.42", "Respirator"],
+                      ["None", "0.43 to 0.7", "Filter"], ["None", "0.43 to 0.7", "None"],
+                      ["Earth", "0.71–1.49", "None"], ["None", "0.71–1.49", "Filter"],
+                      ["None", "1.5 to 2.49", "None"], ["None", "1.5 to 2.49", "Filter"],
+                      ["None", "Varies", "Air Supply"], ["Venus", "Varies", "Vacc Suit"],
+                      ["None", "Varies", "Vacc Suit"], ["None", "2.5+", "None"],
+                      ["None", "0.5 or less", "None"], ["None", "Varies", "Varies"]]
+
+    atmosphere_description_map = {"Tainted": "Tainted atmospheres contain some element that is harmful to "
+                                             "humans, such as an unusually high proportion of carbon dioxide. A "
+                                             "character who breathes a tainted atmosphere without a filter will "
+                                             "suffer 1d6 damage every few minutes (or hours, depending on the "
+                                             "level of taint). ",
+                                  "Exotic": "An exotic atmosphere is unbreathable by humans, but is not otherwise "
+                                            "hazardous. A character needs an air supply to breath in an exotic "
+                                            "atmosphere. ",
+                                  "Corrosive": "Corrosive atmospheres are highly dangerous. A character who "
+                                               "breathes in a corrosive atmosphere will suffer 1d6 damage each round. ",
+                                  "Insidious": "An insidious atmosphere is like a corrosive one, but it is so corrosive"
+                                               " that it attacks equipment as well. The chief danger in an insidious "
+                                               "atmosphere is that the toxic gases will destroy the seals and filters "
+                                               "on the character’s protective gear. An insidious atmosphere worms its "
+                                               "way past protection after 2d6 hours on average, although vigilant "
+                                               "maintenance or advanced protective gear can prolong survival times.",
+                                  "Dense, High": "These worlds have thick N2/O2 atmospheres, but their mean surface "
+                                                 "pressure is too high to support unprotected human life (high "
+                                                 "pressure nitrogen and oxygen are deadly to humans). However, "
+                                                 "pressure naturally decreases with increasing altitude, so if there "
+                                                 "are highlands at the right altitude the pressure may drop enough to "
+                                                 "support human life. Alternatively, there may not be any topography "
+                                                 "high enough for humans to inhabit, necessitating floating gravitic "
+                                                 "or dirigible habitats or sealed habitats on the surface. ",
+                                  "Thin, Low": "The opposite of the Dense, High atmosphere, these massive worlds have "
+                                               "thin N2/O2 atmospheres that settle in the lowlands and depressions and "
+                                               "are only breathable there – the pressure drops off so rapidly with "
+                                               "altitude that the highest topographic points of the surface may be "
+                                               "close to vacuum.",
+                                  "Unusual": "An Unusual atmosphere is a catchall term for an atmosphere that behaves "
+                                             "in a strange manner. Examples include ellipsoidal atmospheres, which are "
+                                             "thin at the poles and dense at the equator; Panthalassic worlds composed "
+                                             "of a rocky core surrounded by a water layer hundreds of kilometres "
+                                             "thick; worlds wracked by storms so intense that that the local air "
+                                             "pressure changes from dense to thin depending on the current weather; "
+                                             "and other planets with unusual and hazardous atmospheric conditions."}
 
     hydrographic_percentage_table = ["0%–5%", "6%–15%", "16%–25%", "26%–35%", "36%–45%", "46%–55%", "56%–65%",
                                      "66%–75%", "76%–85%", "86%–95%", "96–100%"]
@@ -229,6 +291,39 @@ class StarSystem:
                         "Representative democracy", "Feudal technocracy", "Captive government", "Balkanisation",
                         "Civil service bureaucracy", "Impersonal Bureaucracy", "Charismatic dictator",
                         "Non-charismatic leader", "Charismatic oligarchy", "Religious dictatorship"]
+
+    law_level_columns = ["Weapons", "Drugs", "Information", "Technology", "Travellers", "Psionics"]
+    law_level_table = [["None", "None", "None", "None", "None", "None"],
+                       ["Poison gas, explosives, undetectable weapons, WMD",
+                        "Highly addictive and dangerous narcotics", "Intellect programs",
+                        "Dangerous technologies such as nanotechnology",
+                        "Visitors must contact planetary authorities by radio, "
+                        "landing is permitted anywhere", "Dangerous talents must be registered."],
+                       ["Portable energy weapons (except ship-mounted weapons)", "Highly addictive narcotics",
+                        "Agent programs", "Alien technology",
+                        "Visitors must report passenger manifest, landing is permitted anywhere",
+                        "All psionic powers must be registered; use of dangerous powers forbidden."],
+                       ["Heavy weapons", "Combat drugs", "Intrusion programs", "TL 15 items",
+                        "Landing only at starport or other authorised sites",
+                        "Use of telepathy restricted to government approved telepaths"],
+                       ["Light assault weapons and submachine guns", "Addictive narcotics", "Security programs",
+                        "TL 13 items", "Landing only at starport", "Use of teleportation and clairvoyance restricted"],
+                       ["Personal concealable weapons", "Anagathics", "Expert programs", "TL 11 items",
+                        "Citizens must register offworld travel, visitors must register all business",
+                        "Use of all psionic powers restricted to government psionicists"],
+                       ["All firearms except shotguns and stunners; carrying weapons discouraged",
+                        "Fast and Slow drugs", "Recent news from offworld", "TL 9 items",
+                        "Visits discouraged; excessive contact with citizens forbidden",
+                        "Possession of psionic drugs banned"],
+                       ["Shotguns", "All narcotics",
+                       "Library programs, unfiltered data about other worlds. Free speech curtailed.",
+                       "TL 7 items", "Citizens may not leave planet; visitors may not leave starport",
+                        "Use of psionics forbidden"],
+                       ["All bladed weapons, stunners", "Medicinal drugs",
+                        "Information technology, any non-critical data from offworld, personal media.",
+                        "TL 5 items", "Landing permitted only to imperial agents", "Psionic-related technology banned"],
+                       ["Any weapons", "All drugs", "Any data from offworld. No free press", "TL 3 items",
+                        "No offworlders permitted", "All psionics"]]
 
     def __init__(self, name, location, characteristics, bases=None, trade_codes=None, faction=None):
         self.name = name
@@ -434,6 +529,9 @@ class StarSystem:
 
             return session_goods
 
+    def clear_session(self):
+        self.session_purchase_goods = {}
+
     def buy_goods(self, good, broker_roll):
         if good not in self.session_purchase_goods.keys():
             return "Not available! Idiot"
@@ -465,8 +563,21 @@ class StarSystem:
 
         return ret_str
 
-    def clear_session(self):
-        self.session_purchase_goods = {}
+    def size_to_time(self, size):
+        for i in range(11):
+            distance, time = self.distance_to_time_map[i]
+            if size <= distance:
+                return time
+
+    def atmos_desc(self, atmos_list):
+        ret_map = {}
+        for desc in atmos_list:
+            if desc in self.atmosphere_description_map.keys():
+                ret_map[desc] = self.atmosphere_description_map[desc]
+            else:
+                ret_map[desc] = "No description"
+
+        return ret_map
 
     @staticmethod
     def set_to_rep(char_set):
@@ -506,18 +617,34 @@ class StarSystem:
             else:
                 cargo_map[single_cargo] = 1
 
+    @staticmethod
+    def table_to_row(columns, data_map):
+        ret_dict = {}
+        for i in range(len(columns)):
+            ret_dict[columns[i]] = data_map[i]
+
+        return ret_dict
+
     def __str__(self):
         total_str = ""
 
         total_str += "NAME: " + self.name + "\n"
         total_str += "LOCATION: " + self.location + "\n"
-        total_str += "STARPORT QUALITY: " + self.set_to_rep(self.starport_quality) + "\n"
-        total_str += "SIZE (DIAMETER): " + self.set_to_rep(self.size) + " km \n"
-        total_str += "ATMOSPHERE TYPE: " + self.set_to_rep(self.atmosphere_type) + "\n"
+        total_str += "STARPORT QUALITY: " + self.set_to_rep(self.starport_quality) + \
+                     " -> " + \
+                     str(self.table_to_row(self.starport_info_columns,
+                                           self.starport_info_map[self.characteristics[0]])) + "\n"
+        total_str += "SIZE (DIAMETER): " + self.set_to_rep(self.size) + " km" +  " -> " + \
+                     str(self.size_to_time(self.size[1]) / 3600) + " hours or " + \
+                     str(self.size_to_time(self.size[1]) / (24 * 3600)) + " days" + "\n"
+        total_str += "ATMOSPHERE TYPE: " + self.set_to_rep(self.atmosphere_type) + \
+                     " -> " + str(self.atmos_desc(self.atmosphere_type[1])) + "\n"
         total_str += "HYDROGRAPHIC PERCENTAGE: " + self.set_to_rep(self.hydrographic_percentage) + "\n"
         total_str += "POPULATION: " + self.set_to_rep(self.population) + "\n"
         total_str += "GOVERNMENT TYPE: " + self.set_to_rep(self.government_type) + "\n"
-        total_str += "LAW LEVEL: " + str(self.law_level) + "\n"
+        total_str += "LAW LEVEL: " + str(self.law_level) + \
+                     " -> " + \
+                     str(self.table_to_row(self.law_level_columns, self.law_level_table[min(9, self.law_level)])) + "\n"
         total_str += "TECH LEVEL: " + str(self.tech_level) + "\n"
         total_str += "BASES: " + str(self.bases) + "\n"
         total_str += "TRADE CODES: " + str(self.trade_codes) + "\n"

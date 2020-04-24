@@ -18,7 +18,7 @@ def functional():
 
     print(test_planet.get_session_purchase_goods())
     print(test_planet.buy_goods("Basic Ore", 15))
-    print(test_planet.sell_goods("Petrochemicals", 15))
+    print(test_planet_two.sell_goods("Basic Ore", 15))
 
 functional()
 
