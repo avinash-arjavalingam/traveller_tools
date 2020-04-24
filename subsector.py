@@ -1,9 +1,12 @@
 from starsystem import StarSystem
 
+
 class SubSector:
 
-    def  __init__(self):
+    def __init__(self):
+        self.this_planet = None
         self.starsystems = {}
+        self.is_first_time = True
         self.add_starsystem(("Twovapu", "0102", "D664210-4", "SG", "Ga Lo Lt A"))
         print(self.get_starsystem("0102"))
         self.add_starsystem(("Qutra", "0104", "D446545-5", "SG", "Ag Lt Ni"))
@@ -88,3 +91,146 @@ class SubSector:
 
     def get_starsystem(self, starsystem_location):
         return self.starsystems[starsystem_location]
+
+    def start_game(self, starting_planet_sector):
+        self.this_planet = self.get_starsystem(starting_planet_sector)
+        if self.is_first_time:
+            self.this_planet.clear_session()
+            self.this_planet.get_session_purchase_goods()
+            print("PLANET YOU ARE IN")
+            print("--------------------------------------------------------------------------------------------------")
+            print("")
+            print(self.get_starsystem(self.this_planet.location))
+            print("")
+            print("--------------------------------------------------------------------------------------------------")
+            self.is_first_time = False
+        print("")
+        print("ACTIONS:")
+        print("[Move]    [Passengers]    [Freight]    [Mail]    [Buy]    [Sell]")
+        decision = input("What would you like to do? ").lower().strip()
+        if decision == "move":
+            self.move()
+        elif decision == "passengers":
+            self.passengers()
+        elif decision == "freight":
+            self.freight()
+        elif decision == "mail":
+            self.mail()
+        elif decision == "buy":
+            self.buy()
+        elif decision == "sell":
+            self.sell()
+        else:
+            print("Invalid action!")
+
+    def move(self):
+        other_planet = input("What starsytem location you like to go? ").strip()
+        if other_planet not in self.starsystems.keys():
+            print("Not a valid starsystem 4 digit location!")
+        else:
+            self.this_planet.clear_session()
+            self.this_planet = self.starsystems[other_planet]
+            self.is_first_time = True
+
+    def passengers(self):
+        other_planet = input("What other planet (location) are you considering? ").strip()
+        if other_planet not in self.starsystems.keys():
+            print("Not a valid starsystem 4 digit location!")
+        else:
+            other_planet_obj = self.get_starsystem(other_planet)
+            print("")
+            print("PLANET CHOSEN: ")
+            print(other_planet_obj)
+            print("")
+            print("PASSENGER ACTIONS:")
+            print("1: [Get passengers DM]    2: [See available passengers]")
+            two_branch = input("What passenger action would you like to do? Enter the corresponding number: ").strip()
+            if two_branch == "1":
+                print(self.this_planet.get_passengers_base_dm(other_planet_obj))
+            elif two_branch == "2":
+                pass_check = int(
+                    input("Enter the carouse check to get more passengers (Enter 8 for no check): ").strip())
+                print(self.this_planet.get_passengers(other_planet_obj, pass_check))
+
+            else:
+                print("Invalid action!")
+
+    def freight(self):
+        other_planet = input("What other planet (location) are you considering? ").strip()
+        if other_planet not in self.starsystems.keys():
+            print("Not a valid starsystem 4 digit location!")
+        else:
+            other_planet_obj = self.get_starsystem(other_planet)
+            print("")
+            print("PLANET CHOSEN: ")
+            print(other_planet_obj)
+            print("")
+            print("FREIGHT ACTIONS:")
+            print("1: [Get freight DM]    2: [See available freight]")
+            two_branch = input("What freight action would you like to do? Enter the corresponding number: ").strip()
+            if two_branch == "1":
+                print(self.this_planet.get_freight_base_dm(other_planet_obj))
+            elif two_branch == "2":
+                print(self.this_planet.get_freight(other_planet_obj))
+
+            else:
+                print("Invalid action!")
+
+    def mail(self):
+        other_planet = input("What other planet (location) are you considering? ").strip()
+        if other_planet not in self.starsystems.keys():
+            print("Not a valid starsystem 4 digit location!")
+        else:
+            other_planet_obj = self.get_starsystem(other_planet)
+            print("")
+            print("PLANET CHOSEN: ")
+            print(other_planet_obj)
+            print("")
+            has_guns_str = input("Does the ship have guns? y/n: ").lower().strip()
+            has_guns = None
+            if has_guns_str == "y" or has_guns_str == "yes":
+                has_guns = True
+            elif has_guns_str == "n" or has_guns_str == "no":
+                has_guns = False
+            else:
+                print("Invalid action!")
+                return
+            navy_scout_rank = int(input("What is the highest naval/scout rank achieved (0 for none): ").strip())
+            soc_scout_dm = int(input("What is the highest Social Standing modifier? ").strip())
+            print("MAIL ACTIONS:")
+            print("1: [Get mail DM]    2: [See if mail is available]")
+            two_branch = input("What mail action would you like to do? Enter the corresponding number: ").strip()
+            if two_branch == "1":
+                print(self.this_planet.get_mail_dm(other_planet_obj, has_guns, navy_scout_rank, soc_scout_dm))
+            elif two_branch == "2":
+                mail_check = int(input("Enter the 2d6 check to see if there is mail: ").strip())
+                print(self.this_planet.has_mail(other_planet_obj, has_guns, navy_scout_rank, soc_scout_dm, mail_check))
+
+            else:
+                print("Invalid action!")
+
+    def buy(self):
+        sesh_goods = self.this_planet.get_session_purchase_goods()
+        print("BUY ACTIONS:")
+        print("1: [See available goods]    2: [Buy goods]")
+        two_branch = input("What buy action would you like to do? Enter the corresponding number: ").strip()
+        if two_branch == "1":
+            print(sesh_goods)
+        elif two_branch == "2":
+            good = input("What good would you like to buy (Capitalization matters)? ").strip()
+            if good not in sesh_goods.keys():
+                print("Invalid good!")
+            else:
+                broker_check = int(input("Enter the broker check to see how good of a price you get: ").strip())
+                print(self.this_planet.buy_goods(good, broker_check))
+        else:
+            print("Invalid action!")
+
+    def sell(self):
+        good = input("What good would you like to sell (Capitalization matters)? ").strip()
+        if good not in self.this_planet.sell_goods_dm.keys():
+            print("Invalid good!")
+        else:
+            broker_check = int(input("Enter the broker check to see how good of a price you get: ").strip())
+            print(self.this_planet.sell_goods(good, broker_check))
+

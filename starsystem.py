@@ -502,7 +502,11 @@ class StarSystem:
 
     def get_session_purchase_goods(self):
         if self.session_purchase_goods != {}:
-            return self.session_purchase_goods
+            session_goods = {}
+            for final_good, vals in self.session_purchase_goods.items():
+                session_goods[final_good] = str(vals[0]) + " tons at " + str(vals[1]) \
+                                            + " per ton at a purchase DM of " + str(vals[2])
+            return session_goods
         else:
             temp_session_goods = {}
             session_goods = {}
