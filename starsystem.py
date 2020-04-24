@@ -517,7 +517,7 @@ class StarSystem:
                 if added_good in temp_session_goods.keys():
                     temp_session_goods[added_good][0] = temp_session_goods[added_good][0] + added_weight
                 else:
-                    temp_session_goods[added_good] = [added_weight, self.trade_goods_pri[added_good],
+                    temp_session_goods[added_good + " (Rare)"] = [added_weight, self.trade_goods_pri[added_good],
                                                       self.good_trade_dm(added_good, self.trade_goods_pur)
                                                       - self.good_trade_dm(added_good, self.trade_goods_sal)]
 
@@ -566,7 +566,7 @@ class StarSystem:
     def size_to_time(self, size):
         for i in range(11):
             distance, time = self.distance_to_time_map[i]
-            if size <= distance:
+            if (size * 100) <= distance:
                 return time
 
     def atmos_desc(self, atmos_list):

@@ -1,9 +1,13 @@
 from starsystem import StarSystem
+from subsector import SubSector
 
 
 def functional():
-    test_planet = StarSystem("Qewra", "0105", "D46668A-3", "SG", "Ag Lt Ni Ri A")
-    test_planet_two = StarSystem("Zudqe", "0408", "A200657-14", "NTC", "Ht Na Ni Va")
+    test_subsector = SubSector()
+    test_planet = test_subsector.get_starsystem("0105")
+    # StarSystem("Qewra", "0105", "D46668A-3", "SG", "Ag Lt Ni Ri A")
+    test_planet_two = test_subsector.get_starsystem("0408")
+    # StarSystem("Zudqe", "0408", "A200657-14", "NTC", "Ht Na Ni Va")
     print(test_planet)
     print(test_planet_two)
 
@@ -19,6 +23,7 @@ def functional():
     print(test_planet.get_session_purchase_goods())
     print(test_planet.buy_goods("Basic Ore", 15))
     print(test_planet_two.sell_goods("Basic Ore", 15))
+    test_planet.clear_session()
 
 functional()
 
